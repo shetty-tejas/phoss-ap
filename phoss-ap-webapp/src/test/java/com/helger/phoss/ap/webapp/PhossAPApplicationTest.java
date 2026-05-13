@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.ap.webapp;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 final class PhossAPApplicationTest
 {
   @Test
+  @Disabled ("As this requires a working Peppol Certificate")
   void testContextLoads ()
   {}
 }

@@ -62,6 +62,7 @@ public final class PhossAPTelemetry
   // === Inbound ===
   private static volatile LongCounter s_aInboundReceived;
   private static volatile LongCounter s_aInboundReceiverNotServiced;
+  private static volatile LongCounter s_aInboundDuplicateRejections;
   private static volatile LongCounter s_aInboundVerificationAccepted;
   private static volatile LongCounter s_aInboundVerificationRejections;
   private static volatile LongCounter s_aInboundMLSCorrelated;
@@ -111,6 +112,7 @@ public final class PhossAPTelemetry
       // Inbound
       s_aInboundReceived = null;
       s_aInboundReceiverNotServiced = null;
+      s_aInboundDuplicateRejections = null;
       s_aInboundVerificationAccepted = null;
       s_aInboundVerificationRejections = null;
       s_aInboundMLSCorrelated = null;
@@ -216,6 +218,27 @@ public final class PhossAPTelemetry
                        .setUnit ("{message}")
                        .build ();
         s_aInboundReceiverNotServiced = aRet;
+      }
+      return aRet;
+    });
+  }
+
+  @NonNull
+  public static LongCounter inboundDuplicateRejections ()
+  {
+    final LongCounter aFast = s_aInboundDuplicateRejections;
+    if (aFast != null)
+      return aFast;
+
+    return RW_LOCK.writeLockedGet ( () -> {
+      LongCounter aRet = s_aInboundDuplicateRejections;
+      if (aRet == null)
+      {
+        aRet = meter ().counterBuilder (CPhossAPOtel.METRIC_INBOUND_DUPLICATE_REJECTIONS)
+                       .setDescription ("Inbound messages rejected because a duplicate AS4 Message ID or SBDH Instance ID was already received")
+                       .setUnit ("{message}")
+                       .build ();
+        s_aInboundDuplicateRejections = aRet;
       }
       return aRet;
     });

@@ -44,6 +44,8 @@ public final class CPhossAPOtel
   public static final String METRIC_INBOUND_VERIFICATION_REJECTIONS = "phoss.ap.inbound.verification.rejections";
   public static final String METRIC_OUTBOUND_VERIFICATION_REJECTIONS = "phoss.ap.outbound.verification.rejections";
   public static final String METRIC_INBOUND_RECEIVER_NOT_SERVICED = "phoss.ap.inbound.receiver.not_serviced";
+  /** @since 0.10.0 */
+  public static final String METRIC_INBOUND_DUPLICATE_REJECTIONS = "phoss.ap.inbound.duplicate.rejections";
   public static final String METRIC_INBOUND_MLS_CORRELATION_ERRORS = "phoss.ap.inbound.mls.correlation_errors";
   public static final String METRIC_INBOUND_FORWARDING_ERRORS = "phoss.ap.inbound.forwarding.errors";
   public static final String METRIC_INBOUND_FORWARDING_PERMANENT_FAILURES = "phoss.ap.inbound.forwarding.permanent_failures";

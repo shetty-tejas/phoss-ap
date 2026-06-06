@@ -91,6 +91,30 @@ public class APNotificationHandlerOtel implements IAPNotificationHandlerSPI
   }
 
   /** {@inheritDoc} */
+  public void onInboundDuplicateRejected (@NonNull final String sSenderID,
+                                          @NonNull final String sReceiverID,
+                                          @NonNull final String sDocTypeID,
+                                          @NonNull final String sProcessID,
+                                          @Nullable final String sSenderProviderID,
+                                          @Nullable final String sAS4MessageID,
+                                          @NonNull final String sSbdhInstanceID,
+                                          final boolean bIsDuplicateAS4,
+                                          final boolean bIsDuplicateSBDH,
+                                          @NonNull final String sErrorDetails)
+  {
+    final Attributes aAttrs = Attributes.builder ()
+                                        .put (CPhossAPOtel.ATTR_SENDER_ID, sSenderID)
+                                        .put (CPhossAPOtel.ATTR_RECEIVER_ID, sReceiverID)
+                                        .put (CPhossAPOtel.ATTR_DOCTYPE_ID, sDocTypeID)
+                                        .put (CPhossAPOtel.ATTR_PROCESS_ID, sProcessID)
+                                        .put (CPhossAPOtel.ATTR_SBDH_INSTANCE_ID, sSbdhInstanceID)
+                                        .put (CPhossAPOtel.ATTR_IS_DUPLICATE_AS4, bIsDuplicateAS4)
+                                        .put (CPhossAPOtel.ATTR_IS_DUPLICATE_SBDH, bIsDuplicateSBDH)
+                                        .build ();
+    PhossAPTelemetry.inboundDuplicateRejections ().add (1, aAttrs);
+  }
+
+  /** {@inheritDoc} */
   public void onInboundPermanentForwardingFailure (@NonNull final String sTransactionID,
                                                    @NonNull final String sSbdhInstanceID,
                                                    @Nullable final String sErrorDetails)

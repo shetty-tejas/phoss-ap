@@ -20,7 +20,10 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.telemetry.ITelemetrySpan;
+import com.helger.telemetry.TelemetryAttributes;
 
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Scope;
@@ -78,6 +81,41 @@ final class OtelAPSpan implements ITelemetrySpan
   public ITelemetrySpan recordException (@NonNull final Throwable aException)
   {
     m_aSpan.recordException (aException);
+    return this;
+  }
+
+  @NonNull
+  public ITelemetrySpan addEvent (@NonNull final String sName, @NonNull final TelemetryAttributes aAttributes)
+  {
+    if (aAttributes.isEmpty ())
+      m_aSpan.addEvent (sName);
+    else
+    {
+      final AttributesBuilder aAttrBuilder = Attributes.builder ();
+      aAttributes.forEach (new TelemetryAttributes.IVisitor ()
+      {
+        public void onString (@NonNull final String sKey, @NonNull final String sValue)
+        {
+          aAttrBuilder.put (sKey, sValue);
+        }
+
+        public void onLong (@NonNull final String sKey, final long nValue)
+        {
+          aAttrBuilder.put (sKey, nValue);
+        }
+
+        public void onDouble (@NonNull final String sKey, final double dValue)
+        {
+          aAttrBuilder.put (sKey, dValue);
+        }
+
+        public void onBoolean (@NonNull final String sKey, final boolean bValue)
+        {
+          aAttrBuilder.put (sKey, bValue);
+        }
+      });
+      m_aSpan.addEvent (sName, aAttrBuilder.build ());
+    }
     return this;
   }
 

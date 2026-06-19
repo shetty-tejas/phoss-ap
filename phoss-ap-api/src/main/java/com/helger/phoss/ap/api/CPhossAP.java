@@ -68,8 +68,7 @@ public final class CPhossAP
   public static boolean isMLS (@NonNull final IDocumentTypeIdentifier aDocTypeID,
                                @NonNull final IProcessIdentifier aProcessID)
   {
-    return aDocTypeID.hasSameContent (EPredefinedDocumentTypeIdentifier.PEPPOL_MLS_1_0) &&
-      aProcessID.hasSameContent (EPredefinedProcessIdentifier.urn_peppol_edec_mls);
+    return isMLS (aDocTypeID.getURIEncoded (), aProcessID.getURIEncoded ());
   }
 
   /**
@@ -86,6 +85,40 @@ public final class CPhossAP
   public static boolean isMLS (@NonNull final String sDocTypeID, @NonNull final String sProcessID)
   {
     return EPredefinedDocumentTypeIdentifier.PEPPOL_MLS_1_0.getURIEncoded ().equals (sDocTypeID) &&
-      EPredefinedProcessIdentifier.urn_peppol_edec_mls.getURIEncoded ().equals (sProcessID);
+           EPredefinedProcessIdentifier.urn_peppol_edec_mls.getURIEncoded ().equals (sProcessID);
+  }
+
+  /**
+   * Check if the provided document type and process identifiers represent a Peppol MLR message.
+   *
+   * @param aDocTypeID
+   *        The document type identifier. May not be <code>null</code>.
+   * @param aProcessID
+   *        The process identifier. May not be <code>null</code>.
+   * @return <code>true</code> if both identifiers match the Peppol MLR document type and process.
+   * @since 0.10.0
+   */
+  public static boolean isMLR (@NonNull final IDocumentTypeIdentifier aDocTypeID,
+                               @NonNull final IProcessIdentifier aProcessID)
+  {
+    return isMLR (aDocTypeID.getURIEncoded (), aProcessID.getURIEncoded ());
+  }
+
+  /**
+   * Check if the provided URI-encoded document type and process identifier strings represent a
+   * Peppol MLR message.
+   *
+   * @param sDocTypeID
+   *        The URI-encoded document type identifier. May not be <code>null</code>.
+   * @param sProcessID
+   *        The URI-encoded process identifier. May not be <code>null</code>.
+   * @return <code>true</code> if both identifiers match the Peppol MLR document type and process.
+   * @since 0.10.0
+   */
+  public static boolean isMLR (@NonNull final String sDocTypeID, @NonNull final String sProcessID)
+  {
+    return EPredefinedDocumentTypeIdentifier.APPLICATIONRESPONSE_FDC_PEPPOL_EU_POACC_TRNS_MLR_3.getURIEncoded ()
+                                                                                               .equals (sDocTypeID) &&
+           EPredefinedProcessIdentifier.BIS3_MLR.getURIEncoded ().equals (sProcessID);
   }
 }

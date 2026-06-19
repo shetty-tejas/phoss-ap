@@ -37,9 +37,6 @@ import com.helger.phoss.ap.api.model.IInboundTransaction;
 import com.helger.phoss.ap.api.model.MlsOutcome;
 import com.helger.phoss.ap.api.model.MlsOutcomeIssue;
 import com.helger.phoss.ap.api.otel.CPhossAPOtel;
-import com.helger.telemetry.Telemetry;
-import com.helger.telemetry.ETelemetrySpanKind;
-import com.helger.telemetry.ITelemetrySpan;
 import com.helger.phoss.ap.basic.APBasicMetaManager;
 import com.helger.phoss.ap.core.APCoreConfig;
 import com.helger.phoss.ap.core.APCoreMetaManager;
@@ -49,6 +46,9 @@ import com.helger.phoss.ap.core.mls.MlsHandler;
 import com.helger.phoss.ap.core.reporting.APPeppolReportingHelper;
 import com.helger.phoss.ap.db.APJdbcMetaManager;
 import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.telemetry.ETelemetrySpanKind;
+import com.helger.telemetry.ITelemetrySpan;
+import com.helger.telemetry.Telemetry;
 
 /**
  * Internal orchestrator to handle messages received via the Peppol Network
@@ -274,7 +274,8 @@ public final class InboundOrchestrator
                                          sFailureReason);
 
             // Don't send MLS as response to MLS
-            if (!CPhossAP.isMLS (aInboundTx.getDocTypeID (), aInboundTx.getProcessID ()))
+            if (!CPhossAP.isMLR (aInboundTx.getDocTypeID (), aInboundTx.getProcessID ()) &&
+                !CPhossAP.isMLS (aInboundTx.getDocTypeID (), aInboundTx.getProcessID ()))
             {
               // Send asynchronously
               PhotonWorkerPool.getInstance ().run ("send-mls", () -> {

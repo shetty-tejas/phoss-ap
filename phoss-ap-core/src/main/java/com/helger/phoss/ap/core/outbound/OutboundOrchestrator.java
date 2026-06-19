@@ -61,6 +61,7 @@ import com.helger.phase4.peppol.Phase4PeppolSendingReport;
 import com.helger.phase4.profile.peppol.Phase4PeppolHttpClientSettings;
 import com.helger.phase4.sender.EAS4UserMessageSendResult;
 import com.helger.phase4.util.Phase4Exception;
+import com.helger.phoss.ap.api.CPhossAP;
 import com.helger.phoss.ap.api.IOutboundSendingAttemptManager;
 import com.helger.phoss.ap.api.IOutboundTransactionManager;
 import com.helger.phoss.ap.api.codelist.EAttemptStatus;
@@ -704,7 +705,7 @@ public final class OutboundOrchestrator
                                              .endpointDetailProvider (new AS4EndpointDetailProviderConstant (aReceiverCert,
                                                                                                              sReceiverAPURL,
                                                                                                              sReceiverTechnicalContact))
-                                             .certificateConsumer ( (aAPCertificate, aCheckDT, eCertCheckResult) -> {
+                                             .certificateConsumer ((aAPCertificate, aCheckDT, eCertCheckResult) -> {
                                                // Take specifically the
                                                // AP certificate
                                                // verification
@@ -713,7 +714,7 @@ public final class OutboundOrchestrator
                                              })
                                              // Response stuff
                                              .rawResponseConsumer (aSendingReport::setRawHttpResponse)
-                                             .signalMsgConsumer ( (aSignalMsg, aMessageMetadata, aState) -> {
+                                             .signalMsgConsumer ((aSignalMsg, aMessageMetadata, aState) -> {
                                                aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
                                              });
 
@@ -725,15 +726,19 @@ public final class OutboundOrchestrator
                 if (StringHelper.isNotEmpty (aTx.getSbdhType ()))
                   aBuilder.sbdhType (aTx.getSbdhType ());
 
-                // MLS params
-                if (StringHelper.isNotEmpty (aTx.getMlsTo ()))
+                // Don't apply MLS params on MLR and MLS itself
+                if (!CPhossAP.isMLR (aDocTypeID, aProcessID) && !CPhossAP.isMLS (aDocTypeID, aProcessID))
                 {
-                  IParticipantIdentifier aMlsTo = aIF.parseParticipantIdentifier (aTx.getMlsTo ());
-                  if (aMlsTo == null)
-                    aMlsTo = aIF.createParticipantIdentifierWithDefaultScheme (aTx.getMlsTo ());
-                  aBuilder.mlsTo (aMlsTo);
+                  // MLS params
+                  if (StringHelper.isNotEmpty (aTx.getMlsTo ()))
+                  {
+                    IParticipantIdentifier aMlsTo = aIF.parseParticipantIdentifier (aTx.getMlsTo ());
+                    if (aMlsTo == null)
+                      aMlsTo = aIF.createParticipantIdentifierWithDefaultScheme (aTx.getMlsTo ());
+                    aBuilder.mlsTo (aMlsTo);
+                  }
+                  aBuilder.mlsType (APCoreConfig.getMlsType ());
                 }
-                aBuilder.mlsType (APCoreConfig.getMlsType ());
 
                 // Set the main payload
                 final String sPayloadMimeType = aTx.getPayloadMimeType ();
@@ -758,7 +763,7 @@ public final class OutboundOrchestrator
                                  "'");
 
                   // Provide as InputStream to be able to handle larger payloads
-                  aBuilder.payload (HasInputStream.multiple ( () -> aDocPayloadMgr.openDocumentStreamForRead (aTx.getDocumentPath ())));
+                  aBuilder.payload (HasInputStream.multiple (() -> aDocPayloadMgr.openDocumentStreamForRead (aTx.getDocumentPath ())));
                 }
 
                 eResult = Telemetry.withSpan (CPhossAPOtel.SPAN_OUTBOUND_AS4_SEND,
@@ -841,9 +846,9 @@ public final class OutboundOrchestrator
                                                                                 .endpointDetailProvider (new AS4EndpointDetailProviderConstant (aReceiverCert,
                                                                                                                                                 sReceiverAPURL,
                                                                                                                                                 sReceiverTechnicalContact))
-                                                                                .certificateConsumer ( (aAPCertificate,
-                                                                                                        aCheckDT,
-                                                                                                        eCertCheckResult) -> {
+                                                                                .certificateConsumer ((aAPCertificate,
+                                                                                                       aCheckDT,
+                                                                                                       eCertCheckResult) -> {
                                                                                   // Determined by
                                                                                   // SMP
                                                                                   // lookup
@@ -852,9 +857,9 @@ public final class OutboundOrchestrator
                                                                                 })
                                                                                 // Response stuff
                                                                                 .rawResponseConsumer (aSendingReport::setRawHttpResponse)
-                                                                                .signalMsgConsumer ( (aSignalMsg,
-                                                                                                      aMessageMetadata,
-                                                                                                      aState) -> {
+                                                                                .signalMsgConsumer ((aSignalMsg,
+                                                                                                     aMessageMetadata,
+                                                                                                     aState) -> {
                                                                                   aSendingReport.setAS4ReceivedSignalMsg (aSignalMsg);
                                                                                 });
                 eResult = Telemetry.withSpan (CPhossAPOtel.SPAN_OUTBOUND_AS4_SEND,

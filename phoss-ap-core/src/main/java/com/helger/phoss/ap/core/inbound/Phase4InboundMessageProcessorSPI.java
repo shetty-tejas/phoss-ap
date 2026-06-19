@@ -384,8 +384,8 @@ public class Phase4InboundMessageProcessorSPI implements IPhase4PeppolIncomingSB
                 LOGGER.warn (sLogPrefix + "Inbound document verification failed for '" + sSbdhInstanceID + "'");
                 aInboundMgr.updateStatus (sTxID, EInboundStatus.REJECTED);
 
-                // Dop't send MLS as response to MLS
-                if (!CPhossAP.isMLS (aDocTypeID, aProcessID))
+                // Dop't send MLS as response to MLR or MLS
+                if (!CPhossAP.isMLR (aDocTypeID, aProcessID) && !CPhossAP.isMLS (aDocTypeID, aProcessID))
                 {
                   // Send asynchronously
                   PhotonWorkerPool.getInstance ().run ("send-mls", () -> {
